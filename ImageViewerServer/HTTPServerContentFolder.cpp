@@ -108,12 +108,10 @@ namespace lwhttp {
 
 		std::vector<char> tmp;
 		for (const auto &p : m_foldername) {
-			const char *name = sf.conv(p.data());
-			Tools::appendStr(&buf, { "<P><A HREF=\"", HTTPServerPathMapper::encodePath(&tmp, name), "\">", name, "</A></P>\n" });
+			Tools::appendStr(&buf, { "<P><A HREF=\"", HTTPServerPathMapper::encodePath(&tmp, p.data()), "\">", sf.conv(p.data()), "</A></P>\n" });
 		}
 		for (const auto &p : m_filename) {
-			const char *name = sf.conv(p.data());
-			Tools::appendStr(&buf, { "<P><A HREF=\"", HTTPServerPathMapper::encodePath(&tmp, name), "\">", name, "</A></P>\n" });
+			Tools::appendStr(&buf, { "<P><A HREF=\"", HTTPServerPathMapper::encodePath(&tmp, p.data()), "\">", sf.conv(p.data()), "</A></P>\n" });
 		}
 		for (const auto &p : request.param()) {
 			Tools::appendStr(&buf, { "<P>", p.first.c_str(), ":", p.second.c_str(), "</P>" });

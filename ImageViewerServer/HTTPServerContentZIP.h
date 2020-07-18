@@ -28,6 +28,7 @@
 #include "HTTPServerRequest.h"
 
 #include <memory>
+#include <algorithm>
 
 #include "ZipReader.h"
 
@@ -36,6 +37,7 @@ namespace lwhttp {
 	class HTTPServerContentZIP : public HTTPServerContent {
 	private:
 		Tools::ZipReader m_zip;
+		std::vector<long long> m_index;
 		std::vector<char> m_buf;
 		size_t m_current = 0;
 		const char *m_contenttype = nullptr;
@@ -56,7 +58,9 @@ namespace lwhttp {
 	private:
 		HTTPServerContentZIP(const wchar_t *file);
 		int createDirHTML();
+		int createIndex();
 		int createDecompressedFile(long long index);
+		int createDecompressedFileFrame(long long index);
 		void removeIllegalChar() {
 			auto it = m_buf.begin();
 			while (it != m_buf.end()) {

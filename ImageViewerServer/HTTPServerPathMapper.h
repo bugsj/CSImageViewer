@@ -48,7 +48,7 @@ namespace lwhttp {
 		const wchar_t *map(std::vector<wchar_t> *local, const char *path) const {
 			local->clear();
 			std::vector<wchar_t> upath;
-			Tools::appendStr(local, { m_root.data(), Tools::convMBCS2UNICODE(&upath, path) });
+			Tools::appendStr(local, { m_root.data(), Tools::convUTF82UNICODE(&upath, path) });
 			for (auto &ch : *local) {
 				if (ch == L'/') {
 					ch = L'\\';
@@ -57,8 +57,12 @@ namespace lwhttp {
 			return local->data();
 		}
 
-		static const char *encodePath(std::vector<char> *path, const char *rawpath) {
+		static const char *encodePath(std::vector<char> *path, const wchar_t *pathstr) {
+			std::vector<char> vrawpath;
+			Tools::convUNICODE2UTF8(&vrawpath, pathstr);
+			const char *rawpath = vrawpath.data();
 			path->clear();
+
 			while (*rawpath != 0) {
 				if ((*rawpath >= 'A' && *rawpath <= 'Z') || (*rawpath >= 'a' && *rawpath <= 'z')
 					|| (*rawpath >= '0' && *rawpath <= '9')

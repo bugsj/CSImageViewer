@@ -191,6 +191,7 @@
     <ClCompile Include="HTTPServerContentFile.cpp" />
     <ClCompile Include="HTTPServerContentFolder.cpp" />
     <ClCompile Include="HTTPServerContentZIP.cpp" />
+    <ClCompile Include="HTTPServerPathMapper.cpp" />
     <ClCompile Include="HTTPServerRequest.cpp" />
     <ClCompile Include="HTTPServerResponse.cpp" />
     <ClCompile Include="HTTPServerResponser.cpp" />

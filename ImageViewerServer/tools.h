@@ -107,6 +107,8 @@ namespace lwhttp {
 
 		const wchar_t* convMBCS2UNICODE(std::vector<wchar_t>* dst, const char* src);
 		const char* convUNICODE2MBCS(std::vector<char>* dst, const wchar_t* src);
+		const wchar_t *convUTF82UNICODE(std::vector<wchar_t> *dst, const char *src);
+		const char *convUNICODE2UTF8(std::vector<char> *dst, const wchar_t *src);
 
 		inline const wchar_t *transstr(std::vector<wchar_t> *dst, const char *src)
 		{

@@ -77,6 +77,10 @@ namespace lwhttp {
 			DWORD recv_cnt;
 			DWORD flags = 0;
 			int ret = WSARecv(s, &buf, 1, &recv_cnt, &flags, NULL, NULL);
+			if (ret == SOCKET_ERROR) {
+				DWORD recv_err = WSAGetLastError();
+				DEBUGOUTPUTVAR(recv_err);
+			}
 
 			return append(recv_buf.data(), recv_cnt);
 		}

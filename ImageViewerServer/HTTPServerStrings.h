@@ -105,6 +105,9 @@ namespace lwhttp {
 		else if (Tools::templatestricmp(ext, T_TEXT(T, ".zip")) == 0) {
 			contenttype = HTTPContentType::zip;
 		}
+		else if (Tools::templatestricmp(ext, T_TEXT(T, ".mp4")) == 0) {
+			contenttype = HTTPContentType::mp4;
+		}
 		else {
 			contenttype = HTTPContentType::octet;
 		}

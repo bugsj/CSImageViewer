@@ -140,6 +140,9 @@
     <ClCompile Include="HTTPServerContentZIP.cpp">
       <Filter>源文件\HTTPServer</Filter>
     </ClCompile>
+    <ClCompile Include="HTTPServerPathMapper.cpp">
+      <Filter>源文件\HTTPServer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ImageViewerServer.rc">

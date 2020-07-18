@@ -42,14 +42,47 @@ namespace lwhttp {
 		}
 	}
 
-	int HTTPServerContentZIP::createDirHTML() {
+	int HTTPServerContentZIP::createIndex()
+	{
+		m_index.clear();
 		long long n = m_zip.getNumEntries();
-		Tools::transstr(&m_buf, "<HTML>\n<HEAD><TITLE>zip files</TITLE><META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2, user-scalable=yes\"/></HEAD>\n<BODY>\n");
-		Tools::StringFormatter<char> sf;
+		std::vector<std::string> names;
+		names.reserve(n);
 		for (long long i = 0; i < n; ++i) {
-			Tools::appendStr(&m_buf, { "<P><A HREF=\"?index=", sf.conv(i), "\">", m_zip.getName(i), "</A></P>\n" });
+			names.emplace_back(m_zip.getName(i));
+			if (names.back().back() == '/') {
+				continue;
+			}
+			else {
+				m_index.push_back(i);
+			}
 		}
-		Tools::appendStr(&m_buf, "</BODY>\n</HTML>\n" );
+		if (m_index.size() >= 2) {
+			std::sort(m_index.begin(), m_index.end(), [names](auto l, auto r) { return names[l] < names[r]; });
+		}
+		return static_cast<int>(m_index.size());
+	}
+
+	int HTTPServerContentZIP::createDecompressedFileFrame(long long index) {
+		if (m_index.empty() && createIndex() == 0) {
+			Tools::transstr(&m_buf, "<HTML>\n<HEAD><TITLE>zip files</TITLE><META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2, user-scalable=yes\"/></HEAD>\n<BODY /></HTML>\n");
+			removeIllegalChar();
+			return 0;
+		}
+		Tools::transstr(&m_buf, "<HTML>\n<HEAD><TITLE>zip files</TITLE><META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2, user-scalable=yes\"/></HEAD>\n<BODY>\n");
+		long long nxt;
+		auto cur = std::find(m_index.begin(), m_index.end(), index);
+		if (cur != m_index.end()) {
+			if (cur + 1 != m_index.end()) {
+				nxt = *(cur + 1);
+			}
+			else {
+				nxt = index;
+			}
+			Tools::StringFormatter<char> sf;
+			Tools::appendStr(&m_buf, { "<A HREF=\"?index=", sf.conv(nxt) ,"&html=1\"><IMG SRC=\"?index=", sf.conv(index), "\" width=\"100%\" /></A>\n" });
+		}
+		Tools::appendStr(&m_buf, "</BODY>\n</HTML>\n");
 		removeIllegalChar();
 		m_contenttype = HTTPContentType::html;
 		m_statuscode = HTTPStatusCode::OK;
@@ -69,12 +102,35 @@ namespace lwhttp {
 		return 0;
 	}
 
+	int HTTPServerContentZIP::createDirHTML() {
+		if (createIndex() == 0) {
+			Tools::transstr(&m_buf, "<HTML>\n<HEAD><TITLE>zip files</TITLE><META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2, user-scalable=yes\"/></HEAD>\n<BODY /></HTML>\n");
+			removeIllegalChar();
+			return 0;
+		}
+		Tools::transstr(&m_buf, "<HTML>\n<HEAD><TITLE>zip files</TITLE><META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2, user-scalable=yes\"/></HEAD>\n<BODY>\n");
+		Tools::StringFormatter<char> sf;
+		for (auto i : m_index) {
+			Tools::appendStr(&m_buf, { "<P><A HREF=\"?index=", sf.conv(i), "&html=1\">", m_zip.getName(i), "</A></P>\n" });
+		}
+		Tools::appendStr(&m_buf, "</BODY>\n</HTML>\n");
+		removeIllegalChar();
+		m_contenttype = HTTPContentType::html;
+		m_statuscode = HTTPStatusCode::OK;
+		return 0;
+	}
+
 
 	std::unique_ptr<HTTPServerContent> HTTPServerContentZIP::create(const wchar_t *file, const HTTPServerRequest &request) {
 		std::unique_ptr<HTTPServerContentZIP> content(new HTTPServerContentZIP(file));
 		const char *p = request.param("index");
 		if (p != nullptr) {
-			content->createDecompressedFile(atoi(p));
+			if (request.param("html") == nullptr) {
+				content->createDecompressedFile(atoi(p));
+			}
+			else {
+				content->createDecompressedFileFrame(atoi(p));
+			}
 		}
 		else {
 			content->createDirHTML();

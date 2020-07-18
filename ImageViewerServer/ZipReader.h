@@ -67,6 +67,10 @@ namespace lwhttp {
 				}
 
 				zip_file_t *uf = zip_fopen_index(m_za, index, 0);
+				if (uf == NULL) {
+					return 0;
+				}
+
 				long long total_read = 0;
 				long long size_read = 0;
 				while (total_read < size) {
