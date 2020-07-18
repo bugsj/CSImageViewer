@@ -38,9 +38,7 @@ namespace lwhttp {
 		const char *filename = request.getFileName();
 		std::vector<wchar_t> local;
 		const wchar_t *localpath = m_pathmapper->map(&local, request.getFullPath());
-		Tools::TraceInfo(L"local file:");
-		Tools::TraceInfo(localpath);
-		Tools::TraceInfo(L"\n");
+		Tools::TraceInfo({ L"local file:", localpath, L"\n" });
 		if (*filename == '\0') {
 			content = HTTPServerContentFolder::create(localpath, request);
 		}

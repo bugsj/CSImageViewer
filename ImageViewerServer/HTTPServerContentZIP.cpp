@@ -64,10 +64,8 @@ namespace lwhttp {
 	}
 
 	int HTTPServerContentZIP::createDecompressedFileFrame(long long index) {
-		if (m_index.empty() && createIndex() == 0) {
-			Tools::transstr(&m_buf, "<HTML>\n<HEAD><TITLE>zip files</TITLE><META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2, user-scalable=yes\"/></HEAD>\n<BODY /></HTML>\n");
-			removeIllegalChar();
-			return 0;
+		if (m_index.empty()) {
+			createIndex();
 		}
 		Tools::transstr(&m_buf, "<HTML>\n<HEAD><TITLE>zip files</TITLE><META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2, user-scalable=yes\"/></HEAD>\n<BODY>\n");
 		long long nxt;
@@ -82,8 +80,8 @@ namespace lwhttp {
 			Tools::StringFormatter<char> sf;
 			Tools::appendStr(&m_buf, { "<A HREF=\"?index=", sf.conv(nxt) ,"&html=1\"><IMG SRC=\"?index=", sf.conv(index), "\" width=\"100%\" /></A>\n" });
 		}
-		Tools::appendStr(&m_buf, "</BODY>\n</HTML>\n");
-		removeIllegalChar();
+		Tools::appendStr(&m_buf, "<P><A HREF=\"?back=1\">back</A></P>\n</BODY>\n</HTML>\n");
+		m_buf.erase(std::remove(m_buf.begin(), m_buf.end(), '\0'), m_buf.end());
 		m_contenttype = HTTPContentType::html;
 		m_statuscode = HTTPStatusCode::OK;
 		return 0;
@@ -103,18 +101,15 @@ namespace lwhttp {
 	}
 
 	int HTTPServerContentZIP::createDirHTML() {
-		if (createIndex() == 0) {
-			Tools::transstr(&m_buf, "<HTML>\n<HEAD><TITLE>zip files</TITLE><META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2, user-scalable=yes\"/></HEAD>\n<BODY /></HTML>\n");
-			removeIllegalChar();
-			return 0;
-		}
+		createIndex();
 		Tools::transstr(&m_buf, "<HTML>\n<HEAD><TITLE>zip files</TITLE><META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2, user-scalable=yes\"/></HEAD>\n<BODY>\n");
+		Tools::appendStr(&m_buf, { "<P><A HREF=\"./\">back</A></P>\n" });
 		Tools::StringFormatter<char> sf;
 		for (auto i : m_index) {
 			Tools::appendStr(&m_buf, { "<P><A HREF=\"?index=", sf.conv(i), "&html=1\">", m_zip.getName(i), "</A></P>\n" });
 		}
 		Tools::appendStr(&m_buf, "</BODY>\n</HTML>\n");
-		removeIllegalChar();
+		m_buf.erase(std::remove(m_buf.begin(), m_buf.end(), '\0'), m_buf.end());
 		m_contenttype = HTTPContentType::html;
 		m_statuscode = HTTPStatusCode::OK;
 		return 0;

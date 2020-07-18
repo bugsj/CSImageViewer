@@ -44,7 +44,7 @@ namespace lwhttp {
 		HTTPServerPathMapper m_pathmapper;
 
 	public:
-		HTTPServer() : m_pathmapper(L"d:\\SHARE") {
+		HTTPServer(const wchar_t *path) : m_pathmapper(path) {
 			WSADATA wsa;
 			int WSAStartup_result = WSAStartup(MAKEWORD(2, 2), &wsa);
 			DEBUGOUTPUTVAR(WSAStartup_result);

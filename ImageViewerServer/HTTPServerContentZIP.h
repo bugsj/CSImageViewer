@@ -61,17 +61,6 @@ namespace lwhttp {
 		int createIndex();
 		int createDecompressedFile(long long index);
 		int createDecompressedFileFrame(long long index);
-		void removeIllegalChar() {
-			auto it = m_buf.begin();
-			while (it != m_buf.end()) {
-				if (*it != '\0') {
-					++it;
-				}
-				else {
-					it = m_buf.erase(it);
-				}
-			}
-		}
 
 	public:
 		static std::unique_ptr<HTTPServerContent> create(const wchar_t *file, const HTTPServerRequest &request);

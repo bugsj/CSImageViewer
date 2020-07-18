@@ -49,11 +49,9 @@ namespace lwhttp {
 		m_foldername.clear();
 		m_filename.clear();
 		do {
-			if (lstrcmpW(fd.cFileName, L".") == 0 || lstrcmpW(fd.cFileName, L"..") == 0) {
+			if (*reinterpret_cast<unsigned int *>(fd.cFileName) == 0x2e) { // fd.cFileName == L"."
 				continue;
 			}
-
-			DEBUGOUTPUTVAR(fd.cFileName);
 
 			if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				m_foldername.emplace_back(std::vector<wchar_t>());
@@ -84,7 +82,7 @@ namespace lwhttp {
 			Tools::appendStr(&buf, { p.data(), L"\n" });
 		}
 		Tools::transstr(&m_buf, buf.data());
-		removeIllegalChar();
+		m_buf.erase(std::remove(m_buf.begin(), m_buf.end(), '\0'), m_buf.end());
 
 		m_contenttype = HTTPContentType::plain;
 		m_statuscode = HTTPStatusCode::OK;
@@ -119,7 +117,7 @@ namespace lwhttp {
 		Tools::appendStr(&buf, { "</BODY>\n</HTML>\n" });
 
 		m_buf.swap(buf);
-		removeIllegalChar();
+		m_buf.erase(std::remove(m_buf.begin(), m_buf.end(), '\0'), m_buf.end());
 
 		m_contenttype = HTTPContentType::html;
 		m_statuscode = HTTPStatusCode::OK;

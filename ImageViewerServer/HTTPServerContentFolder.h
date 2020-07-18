@@ -61,18 +61,6 @@ namespace lwhttp {
 		bool createPlain();
 		bool createHTML(const HTTPServerRequest &request);
 
-		void removeIllegalChar() {
-			auto it = m_buf.begin();
-			while (it != m_buf.end()) {
-				if (*it != '\0') {
-					++it;
-				}
-				else {
-					it = m_buf.erase(it);
-				}
-			}
-		}
-
 	public:
 		static std::unique_ptr<HTTPServerContent> create(const wchar_t *path, const HTTPServerRequest &request) {
 			std::unique_ptr<HTTPServerContentFolder> content(new HTTPServerContentFolder(path));

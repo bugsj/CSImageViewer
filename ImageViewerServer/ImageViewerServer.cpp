@@ -64,7 +64,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    lwhttp::HTTPServer server;
+    lwhttp::HTTPServer server(L"d:\\SHARE");
     server.start(3);
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_IMAGEVIEWERSERVER));

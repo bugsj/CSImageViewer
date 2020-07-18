@@ -66,61 +66,9 @@ namespace lwhttp {
 			m_content.reset();
 		}
 
-		size_t sendLegacy(SOCKET s) {
-			if (!m_content) {
-				return 0;
-			}
-			constexpr ULONG SENDBLOCK = 262144;
-			WSABUF buf;
-			DWORD sent = 0;
-			DWORD total_send = 0;
-			int ret;
-
-			do
-			{
-				buf.len = std::min(SENDBLOCK, static_cast<ULONG>(m_current - total_send));
-				buf.buf = m_header.data() + total_send;
-				ret = WSASend(s, &buf, 1, &sent, 0, 0, NULL);
-				if (SOCKET_ERROR != ret) {
-					total_send += sent;
-				}
-				else {
-					int socket_err = WSAGetLastError();
-					DEBUGOUTPUTVAR(socket_err);
-					if (socket_err == WSAEWOULDBLOCK) {
-						m_total_sent = total_send;
-						return total_send;
-					}
-				}
-			} while (total_send < m_current && SOCKET_ERROR != ret);
-			Tools::TraceInfo(m_header.data());
-			DEBUGOUTPUTVAR(total_send);
-
-			std::vector<char> contentbuf(SENDBLOCK);
-			while (!m_content->end()) {
-				sent = static_cast<DWORD>(m_content->read(contentbuf.data(), SENDBLOCK));
-				buf.len = std::min(SENDBLOCK, sent);
-				buf.buf = contentbuf.data();
-				ret = WSASend(s, &buf, 1, &sent, 0, 0, NULL);
-				if (SOCKET_ERROR != ret) {
-					total_send += sent;
-				}
-				else {
-					int socket_err = WSAGetLastError();
-					DEBUGOUTPUTVAR(socket_err);
-					if (socket_err == WSAEWOULDBLOCK) {
-						m_total_sent = total_send;
-						return total_send;
-					}
-				}
-			}
-			DEBUGOUTPUTVAR(total_send);
-
-			return total_send;
-		}
-
 		int send(SOCKET s) {
 			if (!m_content) {
+				Tools::TraceInfo(L"Send 0 Content\n");
 				return 0;
 			}
 			constexpr ULONG SENDBLOCK = 262144;
@@ -139,15 +87,14 @@ namespace lwhttp {
 				}
 				else {
 					int socket_err = WSAGetLastError();
-					DEBUGOUTPUTVAR(socket_err);
 					if (socket_err == WSAEWOULDBLOCK) {
 						m_total_sent = total_send;
 						DEBUGOUTPUTVAR(total_send);
 						return total_send;
 					}
+					DEBUGOUTPUTVAR(socket_err);
 				}
 			}
-			Tools::TraceInfo(m_header.data());
 
 			std::vector<char> contentbuf(SENDBLOCK);
 			m_content->setPos(total_send - m_current);
@@ -156,19 +103,21 @@ namespace lwhttp {
 				buf.len = std::min(SENDBLOCK, sent);
 				buf.buf = contentbuf.data();
 				ret = WSASend(s, &buf, 1, &sent, 0, 0, NULL);
-				if (SOCKET_ERROR != ret) {
+				if (ret != SOCKET_ERROR) {
 					total_send += sent;
 				}
 				else {
 					int socket_err = WSAGetLastError();
-					DEBUGOUTPUTVAR(socket_err);
-					if (socket_err == WSAEWOULDBLOCK) {
-						m_total_sent = total_send;
-						DEBUGOUTPUTVAR(total_send);
-						return total_send;
+					m_total_sent = total_send;
+					if (socket_err != WSAEWOULDBLOCK) {
+						DEBUGOUTPUTVAR(socket_err);
 					}
+					break;
 				}
 			}
+
+			Tools::StringFormatter<wchar_t> f;
+			Tools::TraceInfo({ f.conv(total_send), L" of ", f.conv(m_current + m_content->size()), L" sent\n" });
 			DEBUGOUTPUTVAR(total_send);
 			return total_send;
 		}

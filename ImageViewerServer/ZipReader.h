@@ -42,9 +42,7 @@ namespace lwhttp {
 				else {
 					_close(fd);
 					Tools::StringFormatter<wchar_t> sf;
-					Tools::TraceInfo(L"zip: zip open failed(");
-					Tools::TraceInfo(sf.conv(error));
-					Tools::TraceInfo(L")\n");
+					Tools::TraceInfo({ L"zip: zip open failed(", sf.conv(error), L")\n" });
 					return error;
 				}
 			}

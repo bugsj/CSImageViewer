@@ -160,14 +160,10 @@ namespace lwhttp {
 			}
 		}
 		m_paramline.push_back('\0');
-		Tools::TraceInfo(L"request param: ");
-		Tools::TraceInfo(m_paramline.data());
-		Tools::TraceInfo(L"\n");
+		Tools::TraceInfo({ "request param: ", m_paramline.data(), "\n" });
 
 		m_fullpath.push_back('\0');
-		Tools::TraceInfo(L"request path: ");
-		Tools::TraceInfo(m_fullpath.data());
-		Tools::TraceInfo(L"\n");
+		Tools::TraceInfo({ "request path: ", m_fullpath.data(), "\n" });
 
 		auto fiter = m_fullpath.rbegin() + 1;
 		while (fiter != m_fullpath.rend() && *fiter != '/') {
@@ -175,9 +171,7 @@ namespace lwhttp {
 		}
 		std::reverse(m_filename.begin(), m_filename.end());
 		m_filename.push_back('\0');
-		Tools::TraceInfo(L"request file: ");
-		Tools::TraceInfo(m_filename.data());
-		Tools::TraceInfo(L"\n");
+		Tools::TraceInfo({ "request file: ", m_filename.data(), "\n" });
 
 		return true;
 	}

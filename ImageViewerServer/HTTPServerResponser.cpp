@@ -57,6 +57,7 @@ namespace lwhttp {
 			return 0;
 		}
 		m_request.clear();
+		Tools::TraceInfo(L"Event IO selected\n");
 		int ret = m_client.selectEventIO();
 		DWORD idx;
 		do {
@@ -71,16 +72,19 @@ namespace lwhttp {
 				continue;
 			}
 			if (networkevents.lNetworkEvents & FD_READ) {
+				Tools::TraceInfo(L"Event READ\n");
 				if (respone() != 0) {
 					break;
 				}
 			}
 			if (networkevents.lNetworkEvents & FD_WRITE) {
+				Tools::TraceInfo(L"Event WRITE\n");
 				if (writeReady() != 0) {
 					break;
 				}
 			}
 			if (networkevents.lNetworkEvents & FD_CLOSE) {
+				Tools::TraceInfo(L"Event CLOSE\n");
 				break;
 			}
 		} while (m_response.getKeepAlive());

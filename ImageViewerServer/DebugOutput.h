@@ -9,26 +9,41 @@ namespace lwhttp {
 
 	namespace Tools {
 
-		inline void TraceInfo(const char *log)
+		inline void TraceInfoHead()
 		{
-			::OutputDebugStringA(log);
+			DWORD tid = GetCurrentThreadId();
+			lwhttp::Tools::StringFormatter<wchar_t> f;
+			::OutputDebugStringW(L"thread");
+			::OutputDebugStringW(f.conv(tid));
+			::OutputDebugStringW(L" ");
 		}
 
-		inline void TraceInfo(const char *log, const char *end)
+		inline void TraceInfo(const char *log)
 		{
+			TraceInfoHead();
 			::OutputDebugStringA(log);
-			::OutputDebugStringA(end);
 		}
 
 		inline void TraceInfo(const wchar_t *log)
 		{
+			TraceInfoHead();
 			::OutputDebugStringW(log);
 		}
 
-		inline void TraceInfo(const wchar_t *log, const wchar_t *end)
+		inline void TraceInfo(const std::initializer_list<const char *> &ss)
 		{
-			::OutputDebugStringW(log);
-			::OutputDebugStringW(end);
+			TraceInfoHead();
+			for (auto &s : ss) {
+				::OutputDebugStringA(s);
+			}
+		}
+
+		inline void TraceInfo(const std::initializer_list<const wchar_t *> &ss)
+		{
+			TraceInfoHead();
+			for (auto &s : ss) {
+				::OutputDebugStringW(s);
+			}
 		}
 
 		inline void CheckWinAPIHandle(const wchar_t *handlename, HANDLE handle, const wchar_t *func, long long line)
@@ -72,7 +87,12 @@ namespace lwhttp {
 
 
 #define CHECKWINAPIHANDLE(handle)  lwhttp::Tools::CheckWinAPIHandle(L ## #handle, handle, __FUNCTIONW__ , __LINE__)
+
+#ifdef _DEBUG
 #define DEBUGOUTPUTVAR(var)  lwhttp::Tools::DebugOutputVar(L ## #var, var, __FUNCTIONW__ , __LINE__)
+#else
+#define DEBUGOUTPUTVAR __noop
+#endif
 
 		class DebugOutput
 		{
