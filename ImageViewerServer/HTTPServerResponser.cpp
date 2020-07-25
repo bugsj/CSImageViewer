@@ -85,6 +85,7 @@ namespace lwhttp {
 			}
 			if (networkevents.lNetworkEvents & FD_CLOSE) {
 				Tools::TraceInfo(L"Event CLOSE\n");
+				m_response.reset();
 				break;
 			}
 		} while (m_response.getKeepAlive());

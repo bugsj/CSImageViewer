@@ -98,7 +98,7 @@ namespace lwhttp {
 
 			std::vector<char> contentbuf(SENDBLOCK);
 			m_content->setPos(total_send - m_current);
-			while (!m_content->end()) {
+			while (total_send < m_current + m_content->size()) {
 				sent = static_cast<DWORD>(m_content->read(contentbuf.data(), SENDBLOCK));
 				buf.len = std::min(SENDBLOCK, sent);
 				buf.buf = contentbuf.data();
@@ -118,7 +118,7 @@ namespace lwhttp {
 
 			Tools::StringFormatter<wchar_t> f;
 			Tools::TraceInfo({ f.conv(total_send), L" of ", f.conv(m_current + m_content->size()), L" sent\n" });
-			DEBUGOUTPUTVAR(total_send);
+
 			return total_send;
 		}
 
