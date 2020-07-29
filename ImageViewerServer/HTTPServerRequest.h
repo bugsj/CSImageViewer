@@ -59,7 +59,7 @@ namespace lwhttp {
 	public:
 		HTTPServerRequest() : m_buf(RECV_BUFF_DEFAULT_SIZE), m_current(0), m_method(RequestMethod::HTTP_NULL) {}
 
-		void clear() { m_current = 0; }
+		void reset() { m_current = 0; }
 		bool full() const { return m_buf.size() == m_current; }
 
 		size_t append(char *data, size_t size) {
@@ -87,7 +87,7 @@ namespace lwhttp {
 
 
 		size_t set(char *data, size_t size) {
-			clear();
+			reset();
 			return append(data, size);
 		}
 

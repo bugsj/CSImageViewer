@@ -56,7 +56,7 @@ namespace lwhttp {
 			Tools::TraceInfo(L"Event Failed\n");
 			return 0;
 		}
-		m_request.clear();
+		m_request.reset();
 		Tools::TraceInfo(L"Event IO selected\n");
 		int ret = m_client.selectEventIO();
 		DWORD idx;
@@ -88,7 +88,7 @@ namespace lwhttp {
 				m_response.reset();
 				break;
 			}
-		} while (m_response.getKeepAlive());
+		} while (m_response.unfinished() || m_response.getKeepAlive());
 
 		return 0;
 	}

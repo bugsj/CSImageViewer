@@ -55,7 +55,7 @@ namespace lwhttp {
 
 		m_current = strlen(Tools::transstr(&m_header, header));
 		Tools::TraceInfo(L"Response Built\n");
-		m_request.clear();
+		m_request.reset();
 
 		return m_current + m_content->size();
 	}

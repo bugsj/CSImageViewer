@@ -66,6 +66,7 @@ namespace lwhttp {
 			m_content.reset();
 		}
 
+		bool unfinished() { return !m_content || m_total_sent < m_current + m_content->size(); }
 		int send(SOCKET s) {
 			if (!m_content) {
 				Tools::TraceInfo(L"Send 0 Content\n");
